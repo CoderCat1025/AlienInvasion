@@ -8,8 +8,8 @@ public class Player {
 	public int height;
 
 	public Player() {
-		this.x = 300;
-		this.y = 300;
+		this.x = 500;
+		this.y = 500;
 		this.width = 50;
 		this.height = 50;
 	}

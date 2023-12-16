@@ -19,8 +19,8 @@ import javax.swing.Timer;
 
 public class ProjectileDemo extends JPanel implements MouseListener, ActionListener, KeyListener {
 
-	public static final int WIDTH = 600;
-	public static final int HEIGHT = 600;
+	public static final int WIDTH = 1000;
+	public static final int HEIGHT = 1000;
 
 	private JFrame window;
 	private Timer timer;
@@ -28,7 +28,6 @@ public class ProjectileDemo extends JPanel implements MouseListener, ActionListe
 	private Player player;
 	private ArrayList<Projectile> projectiles;
 	private ArrayList<Enemy> enemies;
-	private Projectile projectile;
 	private int currentState = 1;
 	Font titleFont;
 	Font subtitleFont;
@@ -43,12 +42,13 @@ public class ProjectileDemo extends JPanel implements MouseListener, ActionListe
 		player = new Player();
 		projectiles = new ArrayList<Projectile>();
 		enemies = new ArrayList<Enemy>();
-		projectile = new Projectile(player.x, player.y);
+		new Projectile(player.x, player.y);
 		
 		titleFont = new Font("Arial", Font.PLAIN, 48);
 		subtitleFont = new Font("Arial", Font.PLAIN, 25);
 
 		window.addMouseListener(this);
+		window.addKeyListener(this);
 		window.add(this);
 		window.pack();
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -91,6 +91,7 @@ public class ProjectileDemo extends JPanel implements MouseListener, ActionListe
 		player.draw(g);
 		for(Projectile p : projectiles) {
 			p.draw(g);
+			p.update();
 		}
 		for(int i = 0; i < enemies.size(); i++) {
 			enemies.get(i).draw(g);
@@ -146,8 +147,10 @@ public class ProjectileDemo extends JPanel implements MouseListener, ActionListe
 		if (e.getKeyCode()==KeyEvent.VK_ENTER) {
 			if (currentState == 1) {
 				currentState = 2;
+				gameStart();
 			}
 			else if (currentState == 2) {
+				alienSpawn.stop();
 				currentState = 3;
 			}
 			else if (currentState == 3) {
@@ -158,7 +161,8 @@ public class ProjectileDemo extends JPanel implements MouseListener, ActionListe
 		if (e.getKeyCode()==KeyEvent.VK_SPACE) {
 			if (currentState == 1) {
 				JOptionPane.showMessageDialog(null, "Aliens are invading! Click to shoot in the mouse's direction. "
-						+ "Shooting enemies will give you points, and getting hit by an enemy will end the game.");
+						+ "Shooting enemies will give you points, and getting hit by an enemy will end the game."
+						+ "some enemies may move faster. Shooting them will give you more points.");
 			}
 		}
 
@@ -174,5 +178,13 @@ public class ProjectileDemo extends JPanel implements MouseListener, ActionListe
 	public void keyTyped(KeyEvent arg0) {
 		// TODO Auto-generated method stub
 
+	}
+	
+	void gameStart() {
+		alienSpawn = new Timer (1000, null);
+		alienSpawn.start();
+	}
+	void addAlien() {
+		enemies.add(new Enemy());
 	}
 }

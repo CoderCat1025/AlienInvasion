@@ -1,6 +1,7 @@
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
+import java.io.File;
 
 import javax.imageio.ImageIO;
 
@@ -18,16 +19,19 @@ public class Projectile {
 	public double ySpeed;
 	public double maxSpeed;
 
+	
+
+	
 	public Projectile(int x, int y) {
 		this.x = x;
 		this.y = y;
-		this.width = 50;
-		this.height = 50;
+		this.width = 20;
+		this.height = 20;
 		this.xSpeed = 0;
 		this.ySpeed = 0;
 		this.maxSpeed = 20;
 
-		loadImage("Futuristic_Bullet.png");
+		loadImage("betterBullet.png");
 	}
 
 	public void draw(Graphics g) {
@@ -39,6 +43,7 @@ public class Projectile {
 		}
 		else {
 			g.drawImage(image, x, y, width, height, null);
+
 		}
 	}
 
@@ -47,13 +52,14 @@ public class Projectile {
 		y += ySpeed * maxSpeed;
 	}
 
-	void loadImage(String imageFile) {
+	 void loadImage(String imageFile) {
 		if (needImage) {
 			try {
-				image = ImageIO.read(this.getClass().getResourceAsStream("Futuristic_Bullet.png"));
+				image = ImageIO.read(Projectile.class.getResourceAsStream(imageFile));
+
 				gotImage = true;
 			} catch (Exception e) {
-
+				e.printStackTrace();
 			}
 			needImage = false;
 		}
