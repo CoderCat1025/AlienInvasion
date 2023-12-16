@@ -22,12 +22,16 @@ public class ProjectileDemo extends JPanel implements MouseListener, ActionListe
 	public static final int WIDTH = 1000;
 	public static final int HEIGHT = 1000;
 
+	int score = 0;
+
 	private JFrame window;
 	private Timer timer;
 	private Timer alienSpawn;
 	private Player player;
+
 	private ArrayList<Projectile> projectiles;
 	private ArrayList<Enemy> enemies;
+
 	private int currentState = 1;
 	Font titleFont;
 	Font subtitleFont;
@@ -43,7 +47,7 @@ public class ProjectileDemo extends JPanel implements MouseListener, ActionListe
 		projectiles = new ArrayList<Projectile>();
 		enemies = new ArrayList<Enemy>();
 		new Projectile(player.x, player.y);
-		
+
 		titleFont = new Font("Arial", Font.PLAIN, 48);
 		subtitleFont = new Font("Arial", Font.PLAIN, 25);
 
@@ -66,6 +70,7 @@ public class ProjectileDemo extends JPanel implements MouseListener, ActionListe
 		}
 		else if (currentState == 2) {
 			drawGameState(g);
+			updateGameState();
 		}
 		else if (currentState == 3) {
 			drawEndState(g);
@@ -96,6 +101,10 @@ public class ProjectileDemo extends JPanel implements MouseListener, ActionListe
 		for(int i = 0; i < enemies.size(); i++) {
 			enemies.get(i).draw(g);
 		}
+
+		g.setColor(Color.BLACK);
+		g.setFont(subtitleFont);
+		g.drawString("score:" + String.valueOf(score), 500, 50);
 	}
 
 	public void drawEndState(Graphics g) {
@@ -108,6 +117,13 @@ public class ProjectileDemo extends JPanel implements MouseListener, ActionListe
 		g.setFont(subtitleFont);
 		g.drawString("You got killed by an alien", 100, 150);
 		g.drawString("Press ENTER to return to menu", 100, 200);
+	}
+
+	public void updateGameState() {
+		update();
+		if (player.isActive = false) {
+			currentState = 3;
+		}
 	}
 
 	@Override
@@ -166,25 +182,93 @@ public class ProjectileDemo extends JPanel implements MouseListener, ActionListe
 			}
 		}
 
+		//cheats
+		if (e.getKeyCode()==KeyEvent.VK_0) {
+			addAlien();
+		}
+
+		if (e.getKeyCode()==KeyEvent.VK_1) {
+			score++;
+		}
+		if (e.getKeyCode()==KeyEvent.VK_2) {
+			score+=10;
+		}
+		if (e.getKeyCode()==KeyEvent.VK_3) {
+			score+=100;
+		}
+
+		if (e.getKeyCode()==KeyEvent.VK_K) {
+			for (int i = 0; i < enemies.size(); i++) {
+				enemies.remove(i);
+			}
+		}
 	}
 
 	@Override
 	public void keyReleased(KeyEvent arg0) {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void keyTyped(KeyEvent arg0) {
-		// TODO Auto-generated method stub
 
 	}
-	
+
 	void gameStart() {
 		alienSpawn = new Timer (1000, null);
 		alienSpawn.start();
 	}
 	void addAlien() {
-		enemies.add(new Enemy());
+		enemies.add(new Enemy(50, 50));
 	}
+
+	void checkCollision() {
+		for (int i = 0; i < enemies.size(); i++) {
+			enemies.get(i).updateCollision();
+			player.updateCollision();
+
+			if (enemies.get(i).collisionBox.intersects(player.collisionBox)) {
+				enemies.get(i).isActive = false;
+				player.isActive = false;
+			}
+
+			for (int e = 0; e < projectiles.size(); e++) {
+				projectiles.get(e).updateCollision();
+				if (enemies.get(i).collisionBox.intersects(projectiles.get(e).collisionBox)) {
+					enemies.get(i).isActive = false;
+					projectiles.get(e).isActive = false;
+					score++;
+				}
+			}
+		}
+	}
+
+	void purgeObjects() {
+		for (int i = 0; i < enemies.size(); i++) {
+			if (enemies.get(i).isActive = false) {
+				enemies.remove(i);
+			}
+		}
+
+		for(int e = 0; e < projectiles.size(); e++) {
+			if (projectiles.get(e).isActive = false) {
+				projectiles.remove(e);
+			}
+		}
+	}
+
+	void update() {
+		for (int i = 0; i < enemies.size(); i++) {
+			//add alien method that makes them move
+		}
+		for (int e = 0; e < projectiles.size(); e++) {
+			projectiles.get(e).update();
+			if (projectiles.get(e).getX() == 1000 || projectiles.get(e).getY() == 1000) {
+				projectiles.get(e).isActive = false;
+			}
+		}
+		checkCollision();
+		purgeObjects();
+	}
+
 }

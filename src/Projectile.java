@@ -1,5 +1,6 @@
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.File;
 
@@ -19,9 +20,9 @@ public class Projectile {
 	public double ySpeed;
 	public double maxSpeed;
 
-	
+	Rectangle collisionBox;
+	boolean isActive;
 
-	
 	public Projectile(int x, int y) {
 		this.x = x;
 		this.y = y;
@@ -29,7 +30,7 @@ public class Projectile {
 		this.height = 20;
 		this.xSpeed = 0;
 		this.ySpeed = 0;
-		this.maxSpeed = 20;
+		this.maxSpeed = 10;
 
 		loadImage("betterBullet.png");
 	}
@@ -52,7 +53,7 @@ public class Projectile {
 		y += ySpeed * maxSpeed;
 	}
 
-	 void loadImage(String imageFile) {
+	void loadImage(String imageFile) {
 		if (needImage) {
 			try {
 				image = ImageIO.read(Projectile.class.getResourceAsStream(imageFile));
@@ -63,5 +64,17 @@ public class Projectile {
 			}
 			needImage = false;
 		}
+	}
+
+	void updateCollision() {
+		collisionBox.setBounds(x, y, width, height);
+	}
+	
+	int getX() {
+	return x;	
+	}
+	
+	int getY() {
+		return y;
 	}
 }
