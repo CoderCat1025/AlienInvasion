@@ -9,6 +9,8 @@ public class Enemy {
 	int width;
 	int height;
 	int speed;
+	int pointsForDeath;
+	Color enemyColor;
 	
 	int e = new Random().nextInt(4);
 	
@@ -32,36 +34,38 @@ public class Enemy {
 			this.y=new Random().nextInt(950);
 			this.x=950;
 		}
+		
+		collisionBox = new Rectangle();
+		isActive = true;
 
 		this.width = width;
 		this.height = height;
+		enemyColor = Color.BLUE;
 
-		speed = 10;
+		speed = 3;
+		pointsForDeath = 1;
 
 	}
 
 	void draw(Graphics g) {
-		g.setColor(Color.BLUE);
-		g.drawRect(x, y, width, height);
+		g.setColor(enemyColor);
+		g.fillRect(x, y, width, height);
 	}
 
 	void update() {
-		if (x >= 300) {
+		if (x > 450 && x > 450 + speed - 1) {
 			x-= speed;
 		}
-		else if(x < 300) {
-			x+= speed;
+		else if(x < 450 && x < 446 - speed + 1) {
+			x += speed;
 		}
 
-		if (y >= 300) {
+		if (y > 450 && y > 454 + speed - 1) {
 			y-= speed;
 		}
-		else if (y<300) {
-			y-=speed;
+		else if (y < 450 && y < 446 - speed + 1) {
+			y+=speed;
 		} 
-	}
-
-	void updateCollision() {
 		collisionBox.setBounds(x, y, width, height);
 	}
 }

@@ -33,6 +33,9 @@ public class Projectile {
 		this.maxSpeed = 10;
 
 		loadImage("betterBullet.png");
+		
+		collisionBox = new Rectangle();
+		isActive = true;
 	}
 
 	public void draw(Graphics g) {
@@ -51,6 +54,7 @@ public class Projectile {
 	public void update() {
 		x += xSpeed * maxSpeed;
 		y += ySpeed * maxSpeed;
+		collisionBox.setBounds(x, y, width, height);
 	}
 
 	void loadImage(String imageFile) {
@@ -66,10 +70,6 @@ public class Projectile {
 		}
 	}
 
-	void updateCollision() {
-		collisionBox.setBounds(x, y, width, height);
-	}
-	
 	int getX() {
 	return x;	
 	}

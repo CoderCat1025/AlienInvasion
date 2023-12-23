@@ -12,10 +12,12 @@ public class Player {
 	boolean isActive;
 
 	public Player() {
-		this.x = 500;
-		this.y = 500;
+		this.x = 475;
+		this.y = 475;
 		this.width = 50;
 		this.height = 50;
+		
+		collisionBox = new Rectangle();
 	}
 
 	public void draw(Graphics g) {
@@ -23,7 +25,7 @@ public class Player {
 		g.fillRect(x - width / 2, y - height / 2, width, height);
 	}
 	
-	void updateCollision() {
+	void update() {
 		collisionBox.setBounds(x, y, width, height);
 	}
 }

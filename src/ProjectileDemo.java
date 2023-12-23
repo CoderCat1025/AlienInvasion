@@ -171,6 +171,8 @@ public class ProjectileDemo extends JPanel implements MouseListener, ActionListe
 			}
 			else if (currentState == 3) {
 				currentState = 1;
+				player = new Player();
+				score = 0;
 			}
 		}
 
@@ -183,23 +185,29 @@ public class ProjectileDemo extends JPanel implements MouseListener, ActionListe
 		}
 
 		//cheats
+		
+		//spawn aliens
 		if (e.getKeyCode()==KeyEvent.VK_0) {
 			addAlien();
 		}
-
+		
+		//add score
 		if (e.getKeyCode()==KeyEvent.VK_1) {
 			score++;
 		}
+		
 		if (e.getKeyCode()==KeyEvent.VK_2) {
 			score+=10;
 		}
+		
 		if (e.getKeyCode()==KeyEvent.VK_3) {
 			score+=100;
 		}
 
+		//kill all enemies
 		if (e.getKeyCode()==KeyEvent.VK_K) {
 			for (int i = 0; i < enemies.size(); i++) {
-				enemies.remove(i);
+				enemies.get(i).isActive = false;
 			}
 		}
 	}
@@ -224,8 +232,8 @@ public class ProjectileDemo extends JPanel implements MouseListener, ActionListe
 
 	void checkCollision() {
 		for (int i = 0; i < enemies.size(); i++) {
-			enemies.get(i).updateCollision();
-			player.updateCollision();
+			enemies.get(i).update();
+			player.update();
 
 			if (enemies.get(i).collisionBox.intersects(player.collisionBox)) {
 				enemies.get(i).isActive = false;
@@ -233,11 +241,10 @@ public class ProjectileDemo extends JPanel implements MouseListener, ActionListe
 			}
 
 			for (int e = 0; e < projectiles.size(); e++) {
-				projectiles.get(e).updateCollision();
+				projectiles.get(e).update();
 				if (enemies.get(i).collisionBox.intersects(projectiles.get(e).collisionBox)) {
 					enemies.get(i).isActive = false;
 					projectiles.get(e).isActive = false;
-					score++;
 				}
 			}
 		}
@@ -245,22 +252,20 @@ public class ProjectileDemo extends JPanel implements MouseListener, ActionListe
 
 	void purgeObjects() {
 		for (int i = 0; i < enemies.size(); i++) {
-			if (enemies.get(i).isActive = false) {
+			if (!enemies.get(i).isActive) {
 				enemies.remove(i);
+				score+=enemies.get(i).pointsForDeath;
 			}
 		}
 
 		for(int e = 0; e < projectiles.size(); e++) {
-			if (projectiles.get(e).isActive = false) {
+			if (!projectiles.get(e).isActive) {
 				projectiles.remove(e);
 			}
 		}
 	}
 
 	void update() {
-		for (int i = 0; i < enemies.size(); i++) {
-			//add alien method that makes them move
-		}
 		for (int e = 0; e < projectiles.size(); e++) {
 			projectiles.get(e).update();
 			if (projectiles.get(e).getX() == 1000 || projectiles.get(e).getY() == 1000) {
