@@ -33,7 +33,7 @@ public class Projectile {
 		this.maxSpeed = 10;
 
 		loadImage("betterBullet.png");
-		
+
 		collisionBox = new Rectangle();
 		isActive = true;
 	}
@@ -71,9 +71,9 @@ public class Projectile {
 	}
 
 	int getX() {
-	return x;	
+		return x;	
 	}
-	
+
 	int getY() {
 		return y;
 	}

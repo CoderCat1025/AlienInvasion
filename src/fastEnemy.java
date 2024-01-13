@@ -9,5 +9,5 @@ public class fastEnemy extends Enemy {
 		enemyColor = Color.GREEN;
 	}
 
-	
+
 }

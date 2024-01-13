@@ -11,9 +11,9 @@ public class Enemy {
 	int speed;
 	int pointsForDeath;
 	Color enemyColor;
-	
+
 	int e = new Random().nextInt(4);
-	
+
 	Rectangle collisionBox;
 	boolean isActive;
 
@@ -34,7 +34,7 @@ public class Enemy {
 			this.y=new Random().nextInt(950);
 			this.x=950;
 		}
-		
+
 		collisionBox = new Rectangle();
 		isActive = true;
 
