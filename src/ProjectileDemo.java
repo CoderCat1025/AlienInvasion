@@ -27,6 +27,11 @@ public class ProjectileDemo extends JPanel implements MouseListener, ActionListe
 	private ArrayList<Integer> scores = new ArrayList<>();
 	int highScore = 0;
 
+	int enemyType = 0;
+
+	boolean invincible = false;
+	boolean showSettings = false;
+
 	private JFrame window;
 	private Timer timer;
 	private Timer alienSpawn;
@@ -108,7 +113,7 @@ public class ProjectileDemo extends JPanel implements MouseListener, ActionListe
 		g.setColor(Color.GRAY);
 		g.fillRect(0, 0, WIDTH, HEIGHT);
 
-		loadImage("space backkground.png");
+		loadImage("space background.png");
 		g.drawImage(image, 0, 0, ProjectileDemo.WIDTH, ProjectileDemo.HEIGHT, null);
 
 		player.draw(g);
@@ -123,6 +128,14 @@ public class ProjectileDemo extends JPanel implements MouseListener, ActionListe
 		g.setColor(Color.WHITE);
 		g.setFont(subtitleFont);
 		g.drawString("score:" + String.valueOf(score), 500, 50);
+		
+		if (showSettings) {
+			g.setColor(Color.WHITE);
+			g.setFont(subtitleFont);
+			g.drawString("Enemy Type: " + String.valueOf(enemyType), 50, 50);
+			g.drawString("Invincible: " + String.valueOf(invincible), 50, 100);
+			g.drawString("High Score: " + String.valueOf(highScore), 50, 150);
+		}
 	}
 
 	public void drawEndState(Graphics g) {
@@ -190,11 +203,7 @@ public class ProjectileDemo extends JPanel implements MouseListener, ActionListe
 				gameStart();
 			}
 			else if (currentState == 2) {
-				alienSpawn.stop();
-				for (int i = 0; i < enemies.size(); i++) {
-					enemies.get(i).isActive = false;
-				}
-				currentState = 3;
+				gameStop();
 			}
 			else if (currentState == 3) {
 				currentState = 1;
@@ -210,6 +219,15 @@ public class ProjectileDemo extends JPanel implements MouseListener, ActionListe
 						+ "Some enemies are special, indicated by their color. Shooting them will give you more points. \n"
 						+ "There is a faster version of the normal enemy (green) and a slower version that will spawn \n"
 						+ "more enemies when killed (pink).");
+			}
+		}
+		
+		if (e.getKeyCode()==KeyEvent.VK_S) {
+			if (showSettings) {
+				showSettings = false;
+			}
+			else {
+				showSettings = true;
 			}
 		}
 
@@ -239,6 +257,30 @@ public class ProjectileDemo extends JPanel implements MouseListener, ActionListe
 				enemies.get(i).isActive = false;
 			}
 		}
+
+		//enemy spawn settings
+		if (e.getKeyCode()==KeyEvent.VK_E) {
+			if (enemyType < 3) {
+				enemyType++;
+			}
+			else if (enemyType == 3) {
+				enemyType = 0;
+			}
+			else {
+				enemyType = 0;
+				System.out.println("else to 0 (not a number 0 - 3)");
+			}
+		}
+
+		//toggle invincibility
+		if (e.getKeyCode() == KeyEvent.VK_I) {
+			if (invincible) {
+				invincible = false;
+			}
+			else {
+				invincible = true;
+			}
+		}
 	}
 
 	@Override
@@ -254,20 +296,37 @@ public class ProjectileDemo extends JPanel implements MouseListener, ActionListe
 		alienSpawn = new Timer (1000, this);
 		alienSpawn.start();
 	}
-	
+
+	void gameStop() {
+		alienSpawn.stop();
+		for (int i = 0; i < enemies.size(); i++) {
+			enemies.get(i).pointsForDeath = 0;
+			enemies.get(i).enemyID = 0;
+			enemies.get(i).isActive = false;
+		}
+		currentState = 3;
+	}
+
 	void addAlien() {
-		if (new Random().nextInt(20) > 4) {
+		if (enemyType == 0) {
+			if (new Random().nextInt(10) > 1) {
+				enemies.add(new Enemy(50, 50));
+			} else if (new Random().nextInt(3) > 1) {
+				enemies.add(new fastEnemy(40, 40));
+			}
+			else {
+				enemies.add(new weirdEnemy(55, 55));
+			}
+		}
+		else if (enemyType == 1) {
 			enemies.add(new Enemy(50, 50));
-		} else if (new Random().nextInt(3) > 2) {
+		}
+		else if (enemyType == 2) {
 			enemies.add(new fastEnemy(40, 40));
 		}
-		else {
+		else if (enemyType == 3) {
 			enemies.add(new weirdEnemy(55, 55));
 		}
-	}
-	
-	void addNormalAlien() {
-		enemies.add(new Enemy(50, 50));
 	}
 
 	void checkCollision() {
@@ -277,7 +336,10 @@ public class ProjectileDemo extends JPanel implements MouseListener, ActionListe
 
 			if (enemies.get(i).collisionBox.intersects(player.collisionBox)) {
 				enemies.get(i).isActive = false;
-				player.isActive = false;
+				if (!invincible) {
+					player.isActive = false;
+					gameStop();
+				}
 			}
 
 			for (int e = 0; e < projectiles.size(); e++) {
@@ -295,7 +357,12 @@ public class ProjectileDemo extends JPanel implements MouseListener, ActionListe
 			if (!enemies.get(i).isActive) {
 				if (enemies.get(i).getEnemyID() == 3) {
 					for (int e = 0; e < 2; e++) {
-						addNormalAlien();
+						if (enemyType < 3) {
+							enemies.add(new Enemy(50, 50));
+						}
+						else {
+							enemies.add(new weirdEnemy(55, 55));
+						}
 					}
 				}
 				score+=enemies.get(i).pointsForDeath;
@@ -308,12 +375,16 @@ public class ProjectileDemo extends JPanel implements MouseListener, ActionListe
 				projectiles.remove(e);
 			}
 		}
-		
+
 		if (player.isActive = false) {
 			currentState = 3;
 		}
 	}
 
+	void test() {
+		
+	}
+	
 	void update() {
 		for (int e = 0; e < projectiles.size(); e++) {
 			projectiles.get(e).update();
