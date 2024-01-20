@@ -24,6 +24,8 @@ public class ProjectileDemo extends JPanel implements MouseListener, ActionListe
 	public static final int HEIGHT = 1000;
 
 	int score = 0;
+	private ArrayList<Integer> scores = new ArrayList<>();
+	int highScore = 0;
 
 	private JFrame window;
 	private Timer timer;
@@ -36,7 +38,7 @@ public class ProjectileDemo extends JPanel implements MouseListener, ActionListe
 	private int currentState = 1;
 	Font titleFont;
 	Font subtitleFont;
-	
+
 	public static BufferedImage image;
 	public static boolean needImage = true;
 	public static boolean gotImage = false;	
@@ -78,6 +80,13 @@ public class ProjectileDemo extends JPanel implements MouseListener, ActionListe
 			updateGameState();
 		}
 		else if (currentState == 3) {
+			scores.add(score);
+			highScore = score;
+			for (int i = 0; i < scores.size(); i++) {
+				if (scores.get(i) > highScore) {
+					highScore = scores.get(i);
+				}
+			}
 			drawEndState(g);
 		}
 	}
@@ -92,12 +101,13 @@ public class ProjectileDemo extends JPanel implements MouseListener, ActionListe
 		g.setFont(subtitleFont);
 		g.drawString("Press ENTER to start", 100, 150);
 		g.drawString("Press SPACE for instructions", 100, 200);
+		g.drawString("High Score: " + highScore, 100, 300);
 	}
 
 	public void drawGameState(Graphics g) {
 		g.setColor(Color.GRAY);
 		g.fillRect(0, 0, WIDTH, HEIGHT);
-		
+
 		loadImage("space backkground.png");
 		g.drawImage(image, 0, 0, ProjectileDemo.WIDTH, ProjectileDemo.HEIGHT, null);
 
@@ -110,7 +120,7 @@ public class ProjectileDemo extends JPanel implements MouseListener, ActionListe
 			enemies.get(i).draw(g);
 		}
 
-		g.setColor(Color.BLACK);
+		g.setColor(Color.WHITE);
 		g.setFont(subtitleFont);
 		g.drawString("score:" + String.valueOf(score), 500, 50);
 	}
@@ -125,6 +135,8 @@ public class ProjectileDemo extends JPanel implements MouseListener, ActionListe
 		g.setFont(subtitleFont);
 		g.drawString("You got killed by an alien", 100, 150);
 		g.drawString("Press ENTER to return to menu", 100, 200);
+		g.drawString("Score: " + score, 400, 300);
+		g.drawString("High Score: " + highScore, 350, 350);
 	}
 
 	public void updateGameState() {
@@ -179,6 +191,9 @@ public class ProjectileDemo extends JPanel implements MouseListener, ActionListe
 			}
 			else if (currentState == 2) {
 				alienSpawn.stop();
+				for (int i = 0; i < enemies.size(); i++) {
+					enemies.get(i).isActive = false;
+				}
 				currentState = 3;
 			}
 			else if (currentState == 3) {
@@ -190,9 +205,11 @@ public class ProjectileDemo extends JPanel implements MouseListener, ActionListe
 
 		if (e.getKeyCode()==KeyEvent.VK_SPACE) {
 			if (currentState == 1) {
-				JOptionPane.showMessageDialog(null, "Aliens are invading! Click to shoot in the mouse's direction. "
-						+ "Shooting enemies will give you points, and getting hit by an enemy will end the game."
-						+ "Some enemies are special, indicated by their color. Shooting them will give you more points.");
+				JOptionPane.showMessageDialog(null, "Aliens are invading! Click to shoot in the mouse's direction. \n"
+						+ "Shooting enemies will give you points, and getting hit by an enemy will end the game. \n"
+						+ "Some enemies are special, indicated by their color. Shooting them will give you more points. \n"
+						+ "There is a faster version of the normal enemy (green) and a slower version that will spawn \n"
+						+ "more enemies when killed (pink).");
 			}
 		}
 
@@ -228,7 +245,6 @@ public class ProjectileDemo extends JPanel implements MouseListener, ActionListe
 	public void keyReleased(KeyEvent arg0) {
 
 	}
-
 	@Override
 	public void keyTyped(KeyEvent arg0) {
 
@@ -238,21 +254,26 @@ public class ProjectileDemo extends JPanel implements MouseListener, ActionListe
 		alienSpawn = new Timer (1000, this);
 		alienSpawn.start();
 	}
+	
 	void addAlien() {
-		if (new Random().nextInt(20) > 3) {
+		if (new Random().nextInt(20) > 4) {
 			enemies.add(new Enemy(50, 50));
-		} else if (new Random().nextInt(3) > 1) {
-			enemies.add(new fastEnemy(50, 50));
+		} else if (new Random().nextInt(3) > 2) {
+			enemies.add(new fastEnemy(40, 40));
 		}
 		else {
-			enemies.add(new weirdEnemy(40, 40));
+			enemies.add(new weirdEnemy(55, 55));
 		}
+	}
+	
+	void addNormalAlien() {
+		enemies.add(new Enemy(50, 50));
 	}
 
 	void checkCollision() {
+		player.update();
 		for (int i = 0; i < enemies.size(); i++) {
 			enemies.get(i).update();
-			player.update();
 
 			if (enemies.get(i).collisionBox.intersects(player.collisionBox)) {
 				enemies.get(i).isActive = false;
@@ -272,6 +293,11 @@ public class ProjectileDemo extends JPanel implements MouseListener, ActionListe
 	void purgeObjects() {
 		for (int i = 0; i < enemies.size(); i++) {
 			if (!enemies.get(i).isActive) {
+				if (enemies.get(i).getEnemyID() == 3) {
+					for (int e = 0; e < 2; e++) {
+						addNormalAlien();
+					}
+				}
 				score+=enemies.get(i).pointsForDeath;
 				enemies.remove(i);
 			}
@@ -281,6 +307,10 @@ public class ProjectileDemo extends JPanel implements MouseListener, ActionListe
 			if (!projectiles.get(e).isActive) {
 				projectiles.remove(e);
 			}
+		}
+		
+		if (player.isActive = false) {
+			currentState = 3;
 		}
 	}
 
@@ -294,7 +324,7 @@ public class ProjectileDemo extends JPanel implements MouseListener, ActionListe
 		checkCollision();
 		purgeObjects();
 	}
-	
+
 	void loadImage(String imageFile) {
 		if (needImage) {
 			try {

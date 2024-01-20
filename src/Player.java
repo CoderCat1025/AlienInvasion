@@ -12,7 +12,7 @@ public class Player {
 	public int height;
 
 	Rectangle collisionBox;
-	boolean isActive;
+	boolean isActive = true;
 
 	public static BufferedImage image;
 	public static boolean needImage = true;
@@ -43,7 +43,7 @@ public class Player {
 	}
 
 	void update() {
-		collisionBox.setBounds(x, y, width, height);
+		collisionBox.setBounds(x - width/2, y - height/2, width, height);
 	}
 
 	void loadImage(String imageFile) {

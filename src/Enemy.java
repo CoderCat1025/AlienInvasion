@@ -11,6 +11,7 @@ public class Enemy {
 	int speed;
 	int pointsForDeath;
 	Color enemyColor;
+	int enemyID = 1;
 
 	int e = new Random().nextInt(4);
 
@@ -67,5 +68,9 @@ public class Enemy {
 			y+=speed;
 		} 
 		collisionBox.setBounds(x, y, width, height);
+	}
+	
+	int getEnemyID() {
+		return enemyID;
 	}
 }

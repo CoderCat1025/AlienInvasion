@@ -7,6 +7,7 @@ public class fastEnemy extends Enemy {
 		speed = 5;
 		pointsForDeath = 3;
 		enemyColor = Color.GREEN;
+		enemyID = 2;
 	}
 
 
