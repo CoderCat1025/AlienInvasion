@@ -18,6 +18,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
+@SuppressWarnings("serial")
 public class ProjectileDemo extends JPanel implements MouseListener, ActionListener, KeyListener {
 
 	public static final int WIDTH = 1000;
@@ -30,6 +31,8 @@ public class ProjectileDemo extends JPanel implements MouseListener, ActionListe
 	int enemyType = 0;
 
 	boolean invincible = false;
+	boolean pierces = false;
+	int enemySpeed = 0;
 	boolean showSettings = false;
 
 	private JFrame window;
@@ -113,7 +116,7 @@ public class ProjectileDemo extends JPanel implements MouseListener, ActionListe
 		g.setColor(Color.GRAY);
 		g.fillRect(0, 0, WIDTH, HEIGHT);
 
-		loadImage("space background.png");
+		loadImage("space.png");
 		g.drawImage(image, 0, 0, ProjectileDemo.WIDTH, ProjectileDemo.HEIGHT, null);
 
 		player.draw(g);
@@ -129,12 +132,20 @@ public class ProjectileDemo extends JPanel implements MouseListener, ActionListe
 		g.setFont(subtitleFont);
 		g.drawString("score:" + String.valueOf(score), 500, 50);
 		
+		if (!showSettings) {
+			g.setColor(Color.WHITE);
+			g.setFont(subtitleFont);
+			g.drawString("Press S for settings", 50, 50);
+		}
+
 		if (showSettings) {
 			g.setColor(Color.WHITE);
 			g.setFont(subtitleFont);
-			g.drawString("Enemy Type: " + String.valueOf(enemyType), 50, 50);
-			g.drawString("Invincible: " + String.valueOf(invincible), 50, 100);
+			g.drawString("(E) Enemy Type: " + String.valueOf(enemyType), 50, 50);
+			g.drawString("(I) Invincible: " + String.valueOf(invincible), 50, 100);
 			g.drawString("High Score: " + String.valueOf(highScore), 50, 150);
+			g.drawString("(C) Enemy Speed: " + String.valueOf(enemySpeed), 50, 200);
+			g.drawString("(P) Piercing Bullets: " + String.valueOf(pierces), 50, 250);
 		}
 	}
 
@@ -179,6 +190,41 @@ public class ProjectileDemo extends JPanel implements MouseListener, ActionListe
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource()==alienSpawn) {
 			addAlien();
+			for (int i = 0; i < enemies.size(); i++) {
+				if (enemies.get(i).enemyID == 1) {
+					if (enemySpeed == 0) {
+						enemies.get(i).speed = 3;
+					}
+					if (enemySpeed == 1) {
+						enemies.get(i).speed = 4;
+					}
+					if (enemySpeed == -1) {
+						enemies.get(i).speed = 2;
+					}
+				}
+				if (enemies.get(i).enemyID == 2) {
+					if (enemySpeed == 0) {
+						enemies.get(i).speed = 4;
+					}
+					if (enemySpeed == 1) {
+						enemies.get(i).speed = 5;
+					}
+					if (enemySpeed == -1) {
+						enemies.get(i).speed = 3;
+					}
+				}
+				if (enemies.get(i).enemyID == 3) {
+					if (enemySpeed == 0) {
+						enemies.get(i).speed = 2;
+					}
+					if (enemySpeed == 1) {
+						enemies.get(i).speed = 3;
+					}
+					if (enemySpeed == -1) {
+						enemies.get(i).speed = 1;
+					}
+				}
+			}
 		} else {
 			for(int i = 0; i < projectiles.size(); i++) {
 				Projectile p = projectiles.get(i);
@@ -190,6 +236,7 @@ public class ProjectileDemo extends JPanel implements MouseListener, ActionListe
 			repaint();
 		}
 	}
+
 	public void mouseReleased(MouseEvent e) {}
 	public void mouseEntered(MouseEvent e) {}
 	public void mouseExited(MouseEvent e) {}
@@ -221,7 +268,7 @@ public class ProjectileDemo extends JPanel implements MouseListener, ActionListe
 						+ "more enemies when killed (pink).");
 			}
 		}
-		
+
 		if (e.getKeyCode()==KeyEvent.VK_S) {
 			if (showSettings) {
 				showSettings = false;
@@ -268,7 +315,6 @@ public class ProjectileDemo extends JPanel implements MouseListener, ActionListe
 			}
 			else {
 				enemyType = 0;
-				System.out.println("else to 0 (not a number 0 - 3)");
 			}
 		}
 
@@ -281,16 +327,35 @@ public class ProjectileDemo extends JPanel implements MouseListener, ActionListe
 				invincible = true;
 			}
 		}
+
+		//change game speed
+		if (e.getKeyCode() == KeyEvent.VK_C) {
+			if (enemySpeed == 0) {
+				enemySpeed = 1;
+			}
+			else if (enemySpeed == 1) {
+				enemySpeed = -1;
+			}
+			else if (enemySpeed == -1) {
+				enemySpeed = 0;
+			}
+		}
+
+		//piercing bullets
+		if (e.getKeyCode() == KeyEvent.VK_P) {
+			if (pierces) {
+				pierces = false;
+			}
+			else {
+				pierces = true;
+			}
+		}
 	}
 
 	@Override
-	public void keyReleased(KeyEvent arg0) {
-
-	}
+	public void keyReleased(KeyEvent arg0) {}
 	@Override
-	public void keyTyped(KeyEvent arg0) {
-
-	}
+	public void keyTyped(KeyEvent arg0) {}
 
 	void gameStart() {
 		alienSpawn = new Timer (1000, this);
@@ -303,6 +368,11 @@ public class ProjectileDemo extends JPanel implements MouseListener, ActionListe
 			enemies.get(i).pointsForDeath = 0;
 			enemies.get(i).enemyID = 0;
 			enemies.get(i).isActive = false;
+			pierces = false;
+			invincible = false;
+			enemyType = 0;
+			enemySpeed = 0;
+			showSettings = false;
 		}
 		currentState = 3;
 	}
@@ -346,7 +416,9 @@ public class ProjectileDemo extends JPanel implements MouseListener, ActionListe
 				projectiles.get(e).update();
 				if (enemies.get(i).collisionBox.intersects(projectiles.get(e).collisionBox)) {
 					enemies.get(i).isActive = false;
-					projectiles.get(e).isActive = false;
+					if (!pierces) {
+						projectiles.get(e).isActive = false;
+					}
 				}
 			}
 		}
@@ -381,10 +453,6 @@ public class ProjectileDemo extends JPanel implements MouseListener, ActionListe
 		}
 	}
 
-	void test() {
-		
-	}
-	
 	void update() {
 		for (int e = 0; e < projectiles.size(); e++) {
 			projectiles.get(e).update();
@@ -399,7 +467,7 @@ public class ProjectileDemo extends JPanel implements MouseListener, ActionListe
 	void loadImage(String imageFile) {
 		if (needImage) {
 			try {
-				image = ImageIO.read(this.getClass().getResourceAsStream("space background.png"));
+				image = ImageIO.read(this.getClass().getResourceAsStream("space.png"));
 				gotImage = true;
 			} catch (Exception e) {
 
