@@ -84,10 +84,6 @@ public class ProjectileDemo extends JPanel implements MouseListener, ActionListe
 			drawMenuState(g);
 		}
 		else if (currentState == 2) {
-			drawGameState(g);
-			updateGameState();
-		}
-		else if (currentState == 3) {
 			scores.add(score);
 			highScore = score;
 			for (int i = 0; i < scores.size(); i++) {
@@ -95,6 +91,10 @@ public class ProjectileDemo extends JPanel implements MouseListener, ActionListe
 					highScore = scores.get(i);
 				}
 			}
+			drawGameState(g);
+			updateGameState();
+		}
+		else if (currentState == 3) {
 			drawEndState(g);
 		}
 	}
@@ -380,22 +380,22 @@ public class ProjectileDemo extends JPanel implements MouseListener, ActionListe
 	void addAlien() {
 		if (enemyType == 0) {
 			if (new Random().nextInt(10) > 1) {
-				enemies.add(new Enemy(50, 50));
+				enemies.add(new Enemy(90, 90));
 			} else if (new Random().nextInt(3) > 1) {
-				enemies.add(new fastEnemy(40, 40));
+				enemies.add(new fastEnemy(60, 60));
 			}
 			else {
-				enemies.add(new weirdEnemy(55, 55));
+				enemies.add(new weirdEnemy(125, 125));
 			}
 		}
 		else if (enemyType == 1) {
-			enemies.add(new Enemy(50, 50));
+			enemies.add(new Enemy(90, 90));
 		}
 		else if (enemyType == 2) {
-			enemies.add(new fastEnemy(40, 40));
+			enemies.add(new fastEnemy(60, 60));
 		}
 		else if (enemyType == 3) {
-			enemies.add(new weirdEnemy(55, 55));
+			enemies.add(new weirdEnemy(125, 125));
 		}
 	}
 
@@ -430,10 +430,10 @@ public class ProjectileDemo extends JPanel implements MouseListener, ActionListe
 				if (enemies.get(i).getEnemyID() == 3) {
 					for (int e = 0; e < 2; e++) {
 						if (enemyType < 3) {
-							enemies.add(new Enemy(50, 50));
+							enemies.add(new Enemy(90, 90));
 						}
 						else {
-							enemies.add(new weirdEnemy(55, 55));
+							enemies.add(new weirdEnemy(125, 125));
 						}
 					}
 				}

@@ -1,7 +1,10 @@
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
 import java.util.Random;
+
+import javax.imageio.ImageIO;
 
 public class Enemy {
 	int x;
@@ -12,11 +15,12 @@ public class Enemy {
 	int pointsForDeath;
 	Color enemyColor;
 	int enemyID = 1;
+	String imageName;
 
 	int e = new Random().nextInt(4);
 
 	Rectangle collisionBox;
-	boolean isActive;
+	boolean isActive;	
 
 	public Enemy (int width, int height){
 		if (e == 0) {
@@ -42,15 +46,41 @@ public class Enemy {
 		this.width = width;
 		this.height = height;
 		enemyColor = Color.BLUE;
+		imageName = "Enemy.png";
 
 		speed = 3;
 		pointsForDeath = 1;
-
 	}
+	
+	public BufferedImage image;
+	public boolean needImage = true;
+	public boolean gotImage = false;
 
 	void draw(Graphics g) {
-		g.setColor(enemyColor);
-		g.fillRect(x, y, width, height);
+		loadImage(imageName);
+		
+		if (!gotImage) {
+			if (enemyID == 1) {
+				width = 50;
+				height = 50;
+			}
+			else if (enemyID == 2) {
+				width = 40;
+				height = 40;
+			}
+			else if (enemyID == 3) {
+				width = 60;
+				height = 60;
+			}
+			g.setColor(enemyColor);
+			g.fillRect(x, y, width, height);	
+		}
+		else {
+			if (enemyID == 1) {
+				
+			}
+			g.drawImage(image, x - width / 2, y - height / 2, width, height, null);
+		}
 	}
 
 	void update() {
@@ -72,5 +102,17 @@ public class Enemy {
 	
 	int getEnemyID() {
 		return enemyID;
+	}
+	
+	void loadImage(String imageFile) {
+		if (needImage) {
+			try {
+				image = ImageIO.read(this.getClass().getResourceAsStream(imageFile));
+				gotImage = true;
+			} catch (Exception e) {
+
+			}
+			needImage = false;
+		}
 	}
 }

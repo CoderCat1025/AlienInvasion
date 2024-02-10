@@ -1,4 +1,7 @@
 import java.awt.Color;
+import java.awt.image.BufferedImage;
+
+import javax.imageio.ImageIO;
 
 public class weirdEnemy extends Enemy {
 	//this is an enemy that spawns 2 more enemies when defeated.
@@ -12,5 +15,6 @@ public class weirdEnemy extends Enemy {
 		pointsForDeath = 2;
 		speed = 2;
 		enemyID = 3;
+		imageName = "weirdEnemy.png";
 	}
 }
